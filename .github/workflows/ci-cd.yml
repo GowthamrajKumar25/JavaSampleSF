@@ -57,7 +57,7 @@ jobs:
       - name: Print Docker container logs
         run: |
           echo "Fetching logs from the Docker container..."
-          docker logs demospringboot-container
+          docker logs -f demospringboot-container
 
       # Optionally, stop the container after the test
       - name: Stop the Docker container
