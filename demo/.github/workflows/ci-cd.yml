@@ -1,0 +1,38 @@
+# This workflow will build docker image and push it to DockerHub,
+# After that, This wrkflow build and push a new container image to Amazon ECR,
+# and then will deploy a new task definition to Amazon ECS, when there is a push to the "main" branch.
+
+name: CI/CD Pipeline  # Name of the CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]  # Trigger on push events to the main branch
+  pull_request:
+    branches: [ "main" ]  # Trigger on pull requests to the main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest  # Runs on the latest version of Ubuntu | Default operating system environment for workflows unless explicitly specified.
+    
+    steps:
+    - name: Checkout code  # Step to checkout the code from the repository | Fetch the source code repository into the runner machine where our workflow is executing. 
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17 # Step to set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Build with Maven # Step to build the project with Maven
+      run: mvn clean install
+
+    - name: build and push the docker image to dockerhub
+      run: |
+        # 1. Login to DockerHub
+        # 2. Build the Docker image
+        # 3. Push the Docker image to DockerHub
+        docker login -u gowthamdineshrajkumar -p gowthamdineshrajkumar
+        docker build -t gowthamdineshrajkumar/demospringboot .
+        docker push gowthamdineshrajkumar/demospringboot:latest        
