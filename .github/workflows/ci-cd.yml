@@ -24,11 +24,12 @@ jobs:
         java-version: '17'
         distribution: 'oracle'
         
-    - name: Build with Maven # Step to build the project with Maven
-      run: |
-        mvn clean install
-      env:
-        JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
+    - name: Build with Maven
+        working-directory: ./subdirectory-name # Replace with the folder containing your pom.xml
+        run: |
+          mvn clean install
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
     - name: build and push the docker image to dockerhub
       run: |
