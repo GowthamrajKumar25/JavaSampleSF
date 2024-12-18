@@ -25,7 +25,7 @@ jobs:
         distribution: 'oracle'
         
     - name: Build with Maven
-        working-directory: ./subdirectory-name # Replace with the folder containing your pom.xml
+        working-directory: ./demo # Replace with the folder containing your pom.xml
         run: |
           mvn clean install
         env:
