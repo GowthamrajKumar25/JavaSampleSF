@@ -24,11 +24,10 @@ jobs:
         java-version: '17'
         distribution: 'oracle'
         
-    # Build the Spring Boot app using Maven
-      - name: Build Spring Boot App with Maven
+    - name: Build Spring Boot App with Maven
         run: mvn -f demo/pom.xml clean install
-
-    - name: build and push the docker image to dockerhub
+    
+    - name: Build and run the docker image to dockerhub
       run: |
         # 1. Login to DockerHub
         # 2. Build the Docker image
