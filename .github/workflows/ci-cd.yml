@@ -22,11 +22,13 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'temurin'
-        cache: maven
+        distribution: 'oracle'
         
     - name: Build with Maven # Step to build the project with Maven
-      run: mvn -f demo/pom.xml clean install
+      run: |
+        mvn clean install
+      env:
+        JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
     - name: build and push the docker image to dockerhub
       run: |
