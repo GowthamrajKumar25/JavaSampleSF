@@ -1,47 +1,66 @@
-# This workflow will build docker image and push it to DockerHub,
-# After that, This wrkflow build and push a new container image to Amazon ECR,
-# and then will deploy a new task definition to Amazon ECS, when there is a push to the "main" branch.
-
 name: CI/CD Pipeline  # Name of the CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]  # Trigger on push events to the main branch
+    branches:
+      - main  # Trigger on push to the main branch
   pull_request:
-    branches: [ "main" ]  # Trigger on pull requests to the main branch
+    branches:
+      - main  # Trigger on pull request to the main branch
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest  # Runs on the latest version of Ubuntu | Default operating system environment for workflows unless explicitly specified.
     
     steps:
-    - name: Checkout code  # Step to checkout the code from the repository | Fetch the source code repository into the runner machine where our workflow is executing. 
-      uses: actions/checkout@v4
-      
-    - name: Set up JDK 17 # Step to set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'oracle'
-        
-    - name: Build Spring Boot App with Maven
+      # Checkout code from repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Oracle JDK 17
+      - name: Set up Oracle JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'oracle'  # Specify Oracle JDK distribution
+
+      # Build the Spring Boot app using Maven
+      - name: Build Spring Boot App with Maven
         run: mvn -f demo/pom.xml clean install
-    
-    - name: Build and run the docker image to dockerhub
-      run: |
-        # 1. Login to DockerHub
-        # 2. Build the Docker image
-        # 3. Push the Docker image to DockerHub
-        # 4. Run the Docker image
-        # 5. Fetch logs from the running container
-        # 6. Stop the container after the test
-        # 7. Remove the container after the test
-        # 8. Cleanup dangling images (optional)
-        docker login -u gowthamdineshrajkumar -p gowthamdineshrajkumar
-        docker build -f demo/Dockerfile -t gowthamdineshrajkumar/demospringboot .
-        docker push gowthamdineshrajkumar/demospringboot:latest
-        docker run -d --name demospringboot-container -p 8080:8080 gowthamdineshrajkumar/demospringboot:latest
-        docker logs --tail 50 demospringboot-container
-        docker stop demospringboot-container
-        docker rm demospringboot-container
-        docker image prune -f        
+        
+      # Login to DockerHub
+      - name: Login to DockerHub
+        run: |
+          docker login -u gowthamdineshrajkumar -p gowthamdineshrajkumar
+
+      # Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -f demo/Dockerfile -t gowthamdineshrajkumar/demospringboot .
+
+      # Push the Docker image to DockerHub
+      - name: Push the Docker image to DockerHub
+        run: |
+          docker push gowthamdineshrajkumar/demospringboot:latest
+        
+      # Run Docker container in detached mode
+      - name: Run Docker container locally
+        run: |
+          docker run -d -p 8080:8080 --name demospringboot-container gowthamdineshrajkumar/demospringboot:latest
+
+      # List running Docker containers (using docker ps)
+      - name: List running Docker containers
+        run: |
+          docker ps
+
+      # Print logs from the running container
+      - name: Print Docker container logs
+        run: |
+          echo "Fetching logs from the Docker container..."
+          docker logs demospringboot-container
+
+      # Optionally, stop the container after the test
+      - name: Stop the Docker container
+        run: |
+          docker stop demospringboot-container
+          docker rm demospringboot-container       
