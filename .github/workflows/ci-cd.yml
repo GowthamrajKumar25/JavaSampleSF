@@ -26,13 +26,23 @@ jobs:
         cache: maven
         
     - name: Build with Maven # Step to build the project with Maven
-      run: mvn clean install
+      run: mvn -f demo/pom.xml clean install
 
     - name: build and push the docker image to dockerhub
       run: |
         # 1. Login to DockerHub
         # 2. Build the Docker image
         # 3. Push the Docker image to DockerHub
+        # 4. Run the Docker image
+        # 5. Fetch logs from the running container
+        # 6. Stop the container after the test
+        # 7. Remove the container after the test
+        # 8. Cleanup dangling images (optional)
         docker login -u gowthamdineshrajkumar -p gowthamdineshrajkumar
-        docker build -t gowthamdineshrajkumar/demospringboot .
-        docker push gowthamdineshrajkumar/demospringboot:latest        
+        docker build -f demo/Dockerfile -t gowthamdineshrajkumar/demospringboot .
+        docker push gowthamdineshrajkumar/demospringboot:latest
+        docker run -d --name demospringboot-container -p 8080:8080 gowthamdineshrajkumar/demospringboot:latest
+        docker logs --tail 50 demospringboot-container
+        docker stop demospringboot-container
+        docker rm demospringboot-container
+        docker image prune -f        
